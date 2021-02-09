@@ -1,6 +1,5 @@
 package App::diff2vba;
-use 5.008001;
-use strict;
+use 5.014;
 use warnings;
 
 our $VERSION = "0.01";
@@ -14,26 +13,26 @@ __END__
 
 =head1 NAME
 
-App::diff2vba - It's new $module
+App::diff2vba - generate VBA patch script from diff output
 
 =head1 SYNOPSIS
 
-    use App::diff2vba;
+    greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION
 
-App::diff2vba is ...
-
-=head1 LICENSE
-
-Copyright (C) Kazumasa Utashiro.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+B<diff2vba> is a command to generate VBA patch script from diff output.
 
 =head1 AUTHOR
 
-Kazumasa Utashiro E<lt>kaz@utashiro.comE<gt>
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright 2021 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 
