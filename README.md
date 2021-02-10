@@ -1,4 +1,4 @@
-
+[![Build Status](https://travis-ci.com/kaz-utashiro/App-diff2vba.svg?branch=master)](https://travis-ci.com/kaz-utashiro/App-diff2vba)
 # NAME
 
 App::diff2vba - generate VBA patch script from diff output
