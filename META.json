@@ -42,6 +42,8 @@
       },
       "runtime" : {
          "requires" : {
+            "App::Greple::msdoc" : "0",
+            "App::Greple::subst" : "0",
             "App::sdif" : "0",
             "Data::Section::Simple" : "0",
             "Encode" : "0",

@@ -22,7 +22,7 @@ Version 0.02
 
 =head1 SYNOPSIS
 
-greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
+greple -Mmsdoc -Msubst --sccc2 --diff some.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION
 
@@ -50,6 +50,8 @@ cpanm https://github.com/kaz-utashiro/App-diff2vba.git
 =head1 SEE ALSO
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
+
+L<App::Greple::msdoc>, L<https://github.com/kaz-utashiro/greple-msdoc>
 
 L<App::Greple::subst>, L<https://github.com/kaz-utashiro/greple-subst>
 

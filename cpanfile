@@ -1,3 +1,5 @@
+requires 'App::Greple::msdoc';
+requires 'App::Greple::subst';
 requires 'App::sdif';
 requires 'Data::Section::Simple';
 requires 'Encode';

@@ -9,7 +9,7 @@ Version 0.02
 
 # SYNOPSIS
 
-greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
+greple -Mmsdoc -Msubst --sccc2 --diff some.docx | diff2vba > patch.vba
 
 # DESCRIPTION
 
@@ -33,6 +33,8 @@ cpanm https://github.com/kaz-utashiro/App-diff2vba.git
 # SEE ALSO
 
 [App::Greple](https://metacpan.org/pod/App::Greple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
+
+[App::Greple::msdoc](https://metacpan.org/pod/App::Greple::msdoc), [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
 
 [App::Greple::subst](https://metacpan.org/pod/App::Greple::subst), [https://github.com/kaz-utashiro/greple-subst](https://github.com/kaz-utashiro/greple-subst)
 
