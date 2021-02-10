@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 use utf8;
 use Encode;
