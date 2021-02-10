@@ -28,6 +28,33 @@ greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
 
 B<diff2vba> is a command to generate VBA patch script from diff output.
 
+=head1 OPTIONS
+
+=over 7
+
+=item B<--fold>[=I<width>]
+
+Fold VBA string literals.  Default true with 72 column width.
+Specify 0 not to fold.
+
+=item B<--variable>[=I<name>]
+
+Specify VBA array variable name.  Default is C<subst>.
+
+=back
+
+=head1 INSTALL
+
+cpanm https://github.com/kaz-utashiro/App-diff2vba.git
+
+=head1 SEE ALSO
+
+L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
+
+L<App::Greple::subst>, L<https://github.com/kaz-utashiro/greple-subst>
+
+L<https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415>
+
 =head1 AUTHOR
 
 Kazumasa Utashiro

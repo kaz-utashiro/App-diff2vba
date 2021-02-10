@@ -51,8 +51,8 @@ sub run {
 
     $app->initialize;
 
-    for (@ARGV ? @ARGV : '-') {
-	$app->process_file($_);
+    for my $file (@ARGV ? @ARGV : '-') {
+	$app->process_file($file);
     }
 }
 
@@ -60,7 +60,7 @@ sub process_file {
     my $app = shift;
     my $file = shift;
 
-    open my $fh, "<", $file or die "$file: $!\n";
+    open my $fh, $file or die "$file: $!\n";
 
     my @fromto;
     while (<$fh>) {
@@ -152,7 +152,7 @@ sub vba_string_literal {
     my $app = shift;
     chomp(my $s = shift);
     return sprintf qq'"%s"', vba_string($s) unless $app->fold;
-    my $fold = $app->fold_obj;
+    state $fold = $app->fold_obj;
     my @s = do {
 	map { qq'"$_"' }
 	map { _vba_string($_) }
@@ -166,11 +166,11 @@ sub vba_string_literal {
 
 sub fold_obj {
     my $app = shift;
-    state $fold = Text::ANSI::Fold->new(width     => $app->fold,
-					boundary  => $app->boundary,
-					linebreak => $app->linebreak,
-					runin     => $app->margin,
-					runout    => $app->margin);
+    Text::ANSI::Fold->new(width     => $app->fold,
+			  boundary  => $app->boundary,
+			  linebreak => $app->linebreak,
+			  runin     => $app->margin,
+			  runout    => $app->margin);
 }
 
 ######################################################################
