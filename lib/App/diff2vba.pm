@@ -29,7 +29,7 @@ has fold      => ( is => 'ro', default => 72 );
 has boundary  => ( is => 'ro', default => 'word' );
 has linebreak => ( is => 'ro', default => LINEBREAK_ALL );
 has margin    => ( is => 'ro', default => 4 );
-has shift     => ( is => 'ro', default => 2 );
+has indent    => ( is => 'ro', default => 2 );
 has variable  => ( is => 'ro', default => "subst" );
 
 no Moo;
@@ -46,7 +46,7 @@ sub run {
 	verbose | v !
 	fold        :72
 	margin      =i
-	shift       =i
+	indent      =i
 	variable    =s
 	") || pod2usage();
 
@@ -138,15 +138,15 @@ sub subst_pairs {
     my $app = shift;
     my($o, $n) = @_;
     my $s;
-    my $indent = ' ' x $app->shift;
+    my $indent = ' ' x $app->indent;
     join("\n",
 	 "{",
-	 $app->indent($app->vba_string_literal($o) . "\n,\n" .
-		      $app->vba_string_literal($n)),
+	 $app->indent_text($app->vba_string_literal($o) . "\n,\n" .
+			   $app->vba_string_literal($n)),
 	 "}");
 }
 
-sub indent {
+sub indent_text {
     my $app = shift;
     my $indent = ' ' x $app->shift;
     $_[0] =~ s/^/$indent/mgr;
