@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/kaz-utashiro/App-diff2vba.svg?branch=master)](https://travis-ci.com/kaz-utashiro/App-diff2vba)
+[![Actions Status](https://github.com/kaz-utashiro/App-diff2vba/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-diff2vba/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-diff2vba.svg)](https://metacpan.org/release/App-diff2vba)
 # NAME
 
 diff2vba - generate VBA patch script from diff output
@@ -19,12 +19,11 @@ greple -Mmsdoc -Msubst --sccc2 --diff some.docx | diff2vba > patch.vba
 
 - **--fold**\[=_width_\]
 
-    Fold VBA string literals.  Default true with 72 column width.
-    Specify 0 not to fold.
+    Fold string literals.  Default is 72.  Specify 0 not to fold.
 
-- **--variable**\[=_name_\]
+- **--variable**=_name_
 
-    Specify VBA array variable name.  Default is `subst`.
+    Specify array variable name.  Default is `subst`.
 
 # INSTALL
 

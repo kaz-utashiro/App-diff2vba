@@ -4,6 +4,7 @@ requires 'App::sdif';
 requires 'Data::Section::Simple';
 requires 'Encode';
 requires 'Getopt::EX::Long';
+requires 'List::MoreUtils';
 requires 'Moo';
 requires 'Pod::Usage';
 requires 'Text::ANSI::Fold';

@@ -34,12 +34,11 @@ B<diff2vba> is a command to generate VBA patch script from diff output.
 
 =item B<--fold>[=I<width>]
 
-Fold VBA string literals.  Default true with 72 column width.
-Specify 0 not to fold.
+Fold string literals.  Default is 72.  Specify 0 not to fold.
 
-=item B<--variable>[=I<name>]
+=item B<--variable>=I<name>
 
-Specify VBA array variable name.  Default is C<subst>.
+Specify array variable name.  Default is C<subst>.
 
 =back
 

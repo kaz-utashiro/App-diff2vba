@@ -1,6 +1,6 @@
 name = "App-diff2vba"
 readme_from = "script/diff2vba"
-badges = ["travis-ci.com"]
+badges = ['github-actions/test', 'metacpan']
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

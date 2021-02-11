@@ -17,6 +17,7 @@ use Pod::Usage;
 use Text::ANSI::Fold qw(:constants);
 use Text::VisualPrintf qw(vprintf vsprintf);
 use Data::Section::Simple qw(get_data_section);
+use List::MoreUtils qw(pairwise);
 use App::diff2vba::Util;
 use App::sdif::Util;
 
@@ -86,17 +87,16 @@ sub process_file {
 	    next if @lines != $column;
 	    next if $column != 2;
 
-	    push @fromto,
-		map { $app->process_diff($_) } read_unified $fh, @lines;
+	    push @fromto, $app->process_diff(read_unified_2 $fh, @lines);
 	}
     }
 
-    my $data = 
+    my $dim = 
 	sprintf("Dim %s (,) As String = ", $app->variable) .
-	$app->produce_script(@fromto);
-    print $data =~ s/\n(?!\z)/ _\n/mgr;
+	$app->produce_array(@fromto);
+    print $dim =~ s/\n/ _\n/gr, "\n";
 
-    print $app->section('subst_one.vba');
+    print $app->section('subst_one.vba', { VAR => $app->variable } );
 }
 
 sub initialize {
@@ -105,32 +105,36 @@ sub initialize {
 
 sub section {
     my $app = shift;
-    local $_ = get_data_section(+shift);
-    s/\{\{\s*(.*?)\s*\}\}/$1/gee;
+    my $section = shift;
+    my $replace = shift // {};
+    local $_ = get_data_section($section);
+    for my $name (keys %$replace) {
+	s/\b(\Q$name\E)\b/$replace->{$1}/ge;
+    }
     $_;
 }
 
 sub process_diff {
     my $app = shift;
-    my($buf, $mark_re) = @_;
-    my @c = $buf->collect(qr/^[\t ]+$/);
-    my @o = $buf->collect(qr/[-]/);
-    my @n = $buf->collect(qr/[+]/);
-    @o > 0 and @n > 0 and @o == @n or return;
-    s/^[\t +-]// for @c, @o, @n;
-    map { [ $o[$_], $n[$_] ] } 0 .. $#o;
+    my @out;
+    while (my($c, $o, $n) = splice(@_, 0, 3)) {
+	@$o > 0 and @$o == @$n or next;
+	s/^[\t +-]// for @$c, @$o, @$n;
+	push @out, pairwise { [ $a, $b ] } @$o, @$n;
+    }
+    @out;
 }
 
-sub produce_script {
+sub produce_array {
     my $app = shift;
-    my @pairs = map { $app->pairs(@$_) } @_;
-    my $script =
-	"{\n" .
-	$app->indent(join(",\n", @pairs)) . "\n" .
-	"}\n";
+    my @pairs = map { $app->subst_pairs(@$_) } @_;
+    join("\n",
+	 "{",
+	 $app->indent(join(",\n", @pairs)),
+	 "}");
 }
 
-sub pairs {
+sub subst_pairs {
     my $app = shift;
     my($o, $n) = @_;
     my $s;
@@ -151,7 +155,7 @@ sub indent {
 sub vba_string_literal {
     my $app = shift;
     chomp(my $s = shift);
-    return sprintf qq'"%s"', vba_string($s) unless $app->fold;
+    return sprintf qq'"%s"', _vba_string($s) unless $app->fold;
     state $fold = $app->fold_obj;
     my @s = do {
 	map { qq'"$_"' }
@@ -159,9 +163,9 @@ sub vba_string_literal {
 	$fold->text($s)->chops;
     };
     my $width = $app->fold + $app->margin + 2;
-    join '',
-	map({ vsprintf "%-*s &\n", $width, $_ } splice @s, 0, -1),
-	@s;
+    join('',
+	 map({ vsprintf "%-*s &\n", $width, $_ } splice @s, 0, -1),
+	 @s);
 }
 
 sub fold_obj {
@@ -214,21 +218,21 @@ __DATA__
 
 @@ subst_one.vba
 
-For index = 0 To {{ $app->variable }}.GetUpperBound(0)
+For index = 0 To VAR.GetUpperBound(0)
     With Selection.Find
-        .Text = {{ $app->variable }}(index, 0)
-        .Replacement.Text = {{ $app->variable }}(index, 1)
+        .Text = VAR(index, 0)
+        .Replacement.Text = VAR(index, 1)
         .Execute Replace:=wdReplaceOne
     End With
 Next
 
 @@ subst_all.vba
 
-For index = 0 To {{ $app->variable }}.GetUpperBound(0)
+For index = 0 To VAR.GetUpperBound(0)
     With Selection.Find
-        .Text = {{ $app->variable }}(index, 0)
+        .Text = VAR(index, 0)
         Do While .Execute
-            Selection.Range.Text = {{ $app->variable }}(index, 1)
+            Selection.Range.Text = VAR(index, 1)
         Loop
     End With    
 Next
