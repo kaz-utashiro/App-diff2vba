@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/kaz-utashiro/App-diff2vba/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-diff2vba/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-diff2vba.svg)](https://metacpan.org/release/App-diff2vba)
+[![Actions Status](https://github.com/kaz-utashiro/App-diff2vba/workflows/test/badge.svg)](https://github.com/kaz-utashiro/App-diff2vba/actions)
 # NAME
 
 diff2vba - generate VBA patch script from diff output
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -24,6 +24,11 @@ greple -Mmsdoc -Msubst --sccc2 --diff some.docx | diff2vba > patch.vba
 - **--variable**=_name_
 
     Specify array variable name.  Default is `subst`.
+
+- **--**\[**no-**\]**pretty**
+
+    Default true and produce script with newlines and indentation for
+    human readability.  If disabled, produce concise data without them.
 
 # INSTALL
 

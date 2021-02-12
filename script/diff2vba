@@ -18,7 +18,7 @@ diff2vba - generate VBA patch script from diff output
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =head1 SYNOPSIS
 
@@ -39,6 +39,11 @@ Fold string literals.  Default is 72.  Specify 0 not to fold.
 =item B<--variable>=I<name>
 
 Specify array variable name.  Default is C<subst>.
+
+=item B<-->[B<no->]B<pretty>
+
+Default true and produce script with newlines and indentation for
+human readability.  If disabled, produce concise data without them.
 
 =back
 

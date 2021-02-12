@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 use utf8;
 use Encode;
@@ -25,12 +25,14 @@ use Moo;
 
 has debug     => ( is => 'ro' );
 has verbose   => ( is => 'ro', default => 1 );
-has fold      => ( is => 'ro', default => 72 );
+has pretty    => ( is => 'ro', default => 1 );
+has fold      => ( is => 'rw', default => 72 );
 has boundary  => ( is => 'ro', default => 'word' );
 has linebreak => ( is => 'ro', default => LINEBREAK_ALL );
 has margin    => ( is => 'ro', default => 4 );
-has indent    => ( is => 'ro', default => 2 );
+has indent    => ( is => 'rw', default => 2 );
 has variable  => ( is => 'ro', default => "subst" );
+has connect   => ( is => 'rw', default => "\n" );
 
 no Moo;
 
@@ -44,10 +46,12 @@ sub run {
     GetOptions($app, make_options "
 	debug
 	verbose | v !
+	pretty      !
 	fold        :72
 	margin      =i
 	indent      =i
 	variable    =s
+	connect     =s
 	") || pod2usage();
 
     $app->initialize;
@@ -101,6 +105,11 @@ sub process_file {
 
 sub initialize {
     my $app = shift;
+    if (not $app->pretty) {
+	$app->fold(0);
+	$app->indent(0);
+	$app->connect('');
+    }
 }
 
 sub section {
@@ -128,10 +137,7 @@ sub process_diff {
 sub produce_array {
     my $app = shift;
     my @pairs = map { $app->subst_pairs(@$_) } @_;
-    join("\n",
-	 "{",
-	 $app->indent(join(",\n", @pairs)),
-	 "}");
+    $app->enclose_list(@pairs);
 }
 
 sub subst_pairs {
@@ -139,17 +145,8 @@ sub subst_pairs {
     my($o, $n) = @_;
     my $s;
     my $indent = ' ' x $app->indent;
-    join("\n",
-	 "{",
-	 $app->indent_text($app->vba_string_literal($o) . "\n,\n" .
-			   $app->vba_string_literal($n)),
-	 "}");
-}
-
-sub indent_text {
-    my $app = shift;
-    my $indent = ' ' x $app->shift;
-    $_[0] =~ s/^/$indent/mgr;
+    $app->enclose_list($app->vba_string_literal($o),
+		       $app->vba_string_literal($n));
 }
 
 sub vba_string_literal {
@@ -177,12 +174,30 @@ sub fold_obj {
 			  runout    => $app->margin);
 }
 
+sub enclose_list {
+    my $app = shift;
+    my $c = $app->connect;
+    join($c, "{", $app->indent_text(join($c, _join_list(",", @_))), "}");
+}
+
+sub indent_text {
+    my $app = shift;
+    my $indent = ' ' x $app->indent;
+    $_[0] =~ s/^/$indent/mgr;
+}
+
 ######################################################################
 
 sub _vba_string {
     local $_ = shift;
     s/"/""/g;
     $_;
+}
+
+sub _join_list {
+    my $by = shift;
+    return () if @_ < 1;
+    (shift, map { ( $by, $_ ) } @_);
 }
 
 1;
