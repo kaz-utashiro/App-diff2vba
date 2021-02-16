@@ -25,6 +25,7 @@ use Moo;
 
 has debug     => ( is => 'ro' );
 has verbose   => ( is => 'ro', default => 1 );
+has format    => ( is => 'ro', default => 'default' );
 has pretty    => ( is => 'ro', default => 2 );
 has fold      => ( is => 'rw', default => 72 );
 has boundary  => ( is => 'ro', default => 'word' );
@@ -46,6 +47,7 @@ sub run {
     GetOptions($app, make_options "
 	debug
 	verbose | v !
+	format      =s
 	pretty      !
 	fold        :72
 	margin      =i
@@ -60,6 +62,30 @@ sub run {
 	$app->process_file($file);
     }
 }
+
+my %driver = (
+    default => sub {
+	my $app = shift;
+	my @fromto = @_;
+	my $dim = 
+	    sprintf("Dim %s (,) As String = ", $app->variable) .
+	    $app->produce_array(@fromto);
+	print _continue($dim), "\n";
+	print $app->section('subst_one.vba', { VAR => $app->variable } );
+    },
+    dumb => sub {
+	my $app = shift;
+#	$app->fold(0); $app->indent(0); $app->connect('');
+	my @fromto = @_;
+	for my $fromto (@fromto) {
+	    my($from, $to) = @$fromto;
+	    print $app->section('subst_dumb.vba',
+				{ TARGET      => _continue($app->vba_string_literal($from)),
+				  REPLACEMENT => _continue($app->vba_string_literal($to)) });
+	}
+    },
+    );
+
 
 sub process_file {
     my $app = shift;
@@ -95,12 +121,7 @@ sub process_file {
 	}
     }
 
-    my $dim = 
-	sprintf("Dim %s (,) As String = ", $app->variable) .
-	$app->produce_array(@fromto);
-    print $dim =~ s/\n/ _\n/gr, "\n";
-
-    print $app->section('subst_one.vba', { VAR => $app->variable } );
+    $driver{$app->format || 'default'}->($app, @fromto);
 }
 
 sub initialize {
@@ -200,6 +221,10 @@ sub _join_list {
     (shift, map { ( $by, $_ ) } @_);
 }
 
+sub _continue {
+    $_[0] =~ s/\n/ _\n/gr;
+}
+
 1;
 
 =encoding utf-8
@@ -251,4 +276,12 @@ For index = 0 To VAR.GetUpperBound(0)
         Loop
     End With    
 Next
+
+@@ subst_dumb.vba
+
+With Selection.Find
+    .Text = TARGET
+    .Replacement.Text = REPLACEMENT
+    .Execute Replace:=wdReplaceOne
+End With
 
