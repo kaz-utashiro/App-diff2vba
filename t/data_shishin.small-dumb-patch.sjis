@@ -1,0 +1,17 @@
+Sub Patch()
+
+With Selection.Find
+    .Text = " 「機械判読」とは、コンピュータプログラムが自動的にデータを加工、編集等できることを指す。"
+    .Replacement.Text = " 「機械判読」とは、コンピュータープログラムが自動的にデータを加工、編集等できることを指す。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+With Selection.Find
+    .Text = " 「機械判読に適した度合」には、人手をどれだけ要さずに、コンピュータがデータを再利用できるかにより、いくつかの段階がある。コンピュータが自動的にデータを再利用するためには、当該データの論理的な構造を識別（判読）でき、構造中の値（表の中に入っている数値、テキスト等）が処理できるようになっている必要がある。"
+    .Replacement.Text = " 「機械判読に適した度合」には、人手をどれだけ要さずに、コンピューターがデータを再利用できるかにより、いくつかの段階がある。コンピューターが自動的にデータを再利用するためには、当該データの論理的な構造を識別（判読）でき、構造中の値（表の中に入っている数値、テキスト等）が処理できるようになっている必要がある。"
+    .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+End Sub
