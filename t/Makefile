@@ -28,7 +28,7 @@ DIFF2VBA = perl -I../lib ../script/diff2vba
 	$(GREPLE) --all-sample-dict --diff $< | sed 1,2d > $@
 
 %.small-diff: %.docx
-	$(GREPLE) --dictdata $$'コンピューター? コンピューター' --diff $< | sed 1,2d > $@
+	$(GREPLE) --dict small.dict --diff $< | sed 1,2d > $@
 
 
 %.stat: %.docx
