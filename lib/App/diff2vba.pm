@@ -75,7 +75,6 @@ my %driver = (
     },
     dumb => sub {
 	my $app = shift;
-#	$app->fold(0); $app->indent(0); $app->connect('');
 	my @fromto = @_;
 	for my $fromto (@fromto) {
 	    my($from, $to) = @$fromto;
@@ -85,7 +84,6 @@ my %driver = (
 	}
     },
     );
-
 
 sub process_file {
     my $app = shift;
@@ -121,7 +119,9 @@ sub process_file {
 	}
     }
 
+    print "Sub Patch()\n\n";
     $driver{$app->format || 'default'}->($app, @fromto);
+    print "End Sub\n";
 }
 
 sub initialize {
@@ -283,5 +283,15 @@ With Selection.Find
     .Text = TARGET
     .Replacement.Text = REPLACEMENT
     .Execute Replace:=wdReplaceOne
+End With
+Selection.Collapse Direction:=wdCollapseEnd
+
+@@ subst_dumb2.vba
+
+With Selection.Find
+    .Text = TARGET
+    if .Execute Then
+        Selection.Range.Text = REPLACEMENT
+    End If
 End With
 
