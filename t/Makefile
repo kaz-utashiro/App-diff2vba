@@ -12,14 +12,18 @@ PATCH += $(NAME:=.pretty-patch)
 PATCH += $(NAME:=.small-pretty-patch)
 PATCH += $(NAME:=.small-dumb-patch)
 
+SJIS = $(PATCH:=.sjis)
+
 ALL = $(DIFF) $(STAT) $(PATCH)
 
 all: $(ALL)
 
+sjis: $(SJIS)
+
 $(ALL): Makefile
 
 clean:
-	rm -f $(ALL)
+	rm -f $(ALL) $(SJIS)
 
 GREPLE = greple -Mmsdoc -Msubst --check=any
 DIFF2VBA = perl -I../lib ../script/diff2vba
@@ -53,3 +57,5 @@ DIFF2VBA = perl -I../lib ../script/diff2vba
 %.small-dumb-patch: %.small-diff
 	$(DIFF2VBA) --no-pretty --format=dumb $< > $@
 
+%patch.sjis: %patch
+	iconv -f utf8 -t sjis < $< > $@
