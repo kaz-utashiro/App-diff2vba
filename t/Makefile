@@ -1,4 +1,4 @@
-DOCX  = $(wildcard *.docx)
+DOCX  = $(filter-out ~%,$(wildcard *.docx))
 NAME  = $(basename $(DOCX))
 
 DIFF  = $(NAME:=.diff)
