@@ -25,7 +25,7 @@ use Moo;
 
 has debug     => ( is => 'ro' );
 has verbose   => ( is => 'ro', default => 1 );
-has pretty    => ( is => 'ro', default => 1 );
+has pretty    => ( is => 'ro', default => 2 );
 has fold      => ( is => 'rw', default => 72 );
 has boundary  => ( is => 'ro', default => 'word' );
 has linebreak => ( is => 'ro', default => LINEBREAK_ALL );
@@ -159,9 +159,9 @@ sub vba_string_literal {
 	map { _vba_string($_) }
 	$fold->text($s)->chops;
     };
-    my $width = $app->fold + $app->margin + 2;
-    join('',
-	 map({ vsprintf "%-*s &\n", $width, $_ } splice @s, 0, -1),
+    my $width = $app->fold + $app->margin + length('""');
+    join("\n",
+	 map({ vsprintf "%-*s &", $width, $_ } splice @s, 0, -1),
 	 @s);
 }
 

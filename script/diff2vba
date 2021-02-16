@@ -22,7 +22,8 @@ Version 0.03
 
 =head1 SYNOPSIS
 
-greple -Mmsdoc -Msubst --sccc2 --diff some.docx | diff2vba > patch.vba
+greple -Mmsdoc -Msubst \
+    --all-sample-dict --diff some.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION
 
