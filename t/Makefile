@@ -6,9 +6,11 @@ DIFF += $(NAME:=.small-diff)
 STAT  = $(NAME:=.stat)
 
 PATCH  = $(NAME:=.patch)
-PATCH += $(NAME:=.pretty-patch)
 PATCH += $(NAME:=.small-patch)
+PATCH += $(NAME:=.dumb-patch)
+PATCH += $(NAME:=.pretty-patch)
 PATCH += $(NAME:=.small-pretty-patch)
+PATCH += $(NAME:=.small-dumb-patch)
 
 ALL = $(DIFF) $(STAT) $(PATCH)
 
@@ -23,10 +25,10 @@ GREPLE = greple -Mmsdoc -Msubst --check=any
 DIFF2VBA = perl -I../lib ../script/diff2vba
 
 %.diff: %.docx
-	$(GREPLE) --all-sample-dict --diff $< > $@
+	$(GREPLE) --all-sample-dict --diff $< | sed 1,2d > $@
 
 %.small-diff: %.docx
-	$(GREPLE) --dictdata $$'コンピューター? コンピューター' --diff $< > $@
+	$(GREPLE) --dictdata $$'コンピューター? コンピューター' --diff $< | sed 1,2d > $@
 
 
 %.stat: %.docx
@@ -44,4 +46,10 @@ DIFF2VBA = perl -I../lib ../script/diff2vba
 
 %.small-pretty-patch: %.small-diff
 	$(DIFF2VBA) --pretty $< > $@
+
+%.dumb-patch: %.diff
+	$(DIFF2VBA) --no-pretty --format=dumb $< > $@
+
+%.small-dumb-patch: %.small-diff
+	$(DIFF2VBA) --no-pretty --format=dumb $< > $@
 
