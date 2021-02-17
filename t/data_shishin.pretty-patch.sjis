@@ -1,5 +1,12 @@
 Sub Patch()
 
+With Selection.Find
+    .MatchCase = True
+    .MatchByte = True
+    .IgnoreSpace = False
+    .IgnorePunct = False
+End With
+
 Dim subst (,) As String = { _
   { _
     "　我が国においては、平成23年３月11日の東日本大震災以降、政府、地方公共団"     & _
@@ -332,10 +339,6 @@ Dim subst (,) As String = { _
 }
 For index = 0 To subst.GetUpperBound(0)
     With Selection.Find
-        .MatchCase = True
-        .MatchByte = True
-        .IgnoreSpace = False
-        .IgnorePunct = False
         .Text = subst(index, 0)
         .Replacement.Text = subst(index, 1)
         .Execute Replace:=wdReplaceOne
