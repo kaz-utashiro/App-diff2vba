@@ -260,26 +260,40 @@ __DATA__
 
 For index = 0 To VAR.GetUpperBound(0)
     With Selection.Find
+        .MatchCase = True
+        .MatchByte = True
+        .IgnoreSpace = False
+        .IgnorePunct = False
         .Text = VAR(index, 0)
         .Replacement.Text = VAR(index, 1)
         .Execute Replace:=wdReplaceOne
     End With
+    Selection.Collapse Direction:=wdCollapseEnd
 Next
 
 @@ subst_all.vba
 
 For index = 0 To VAR.GetUpperBound(0)
     With Selection.Find
+        .MatchCase = True
+        .MatchByte = True
+        .IgnoreSpace = False
+        .IgnorePunct = False
         .Text = VAR(index, 0)
         Do While .Execute
             Selection.Range.Text = VAR(index, 1)
         Loop
     End With    
+    Selection.Collapse Direction:=wdCollapseEnd
 Next
 
 @@ subst_dumb.vba
 
 With Selection.Find
+    .MatchCase = True
+    .MatchByte = True
+    .IgnoreSpace = False
+    .IgnorePunct = False
     .Text = TARGET
     .Replacement.Text = REPLACEMENT
     .Execute Replace:=wdReplaceOne
@@ -289,6 +303,10 @@ Selection.Collapse Direction:=wdCollapseEnd
 @@ subst_dumb2.vba
 
 With Selection.Find
+    .MatchCase = True
+    .MatchByte = True
+    .IgnoreSpace = False
+    .IgnorePunct = False
     .Text = TARGET
     if .Execute Then
         Selection.Range.Text = REPLACEMENT

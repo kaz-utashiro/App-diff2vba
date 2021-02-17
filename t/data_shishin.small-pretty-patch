@@ -25,10 +25,15 @@ Dim subst (,) As String = { _
 }
 For index = 0 To subst.GetUpperBound(0)
     With Selection.Find
+        .MatchCase = True
+        .MatchByte = True
+        .IgnoreSpace = False
+        .IgnorePunct = False
         .Text = subst(index, 0)
         .Replacement.Text = subst(index, 1)
         .Execute Replace:=wdReplaceOne
     End With
+    Selection.Collapse Direction:=wdCollapseEnd
 Next
 
 End Sub
