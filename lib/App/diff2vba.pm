@@ -120,6 +120,7 @@ sub process_file {
     }
 
     print "Sub Patch()\n\n";
+    print $app->section("setup.vba");
     $driver{$app->format || 'default'}->($app, @fromto);
     print "End Sub\n";
 }
@@ -256,14 +257,19 @@ it under the same terms as Perl itself.
 
 __DATA__
 
+@@ setup.vba
+
+With Selection.Find
+    .MatchCase = True
+    .MatchByte = True
+    .IgnoreSpace = False
+    .IgnorePunct = False
+End With
+
 @@ subst_one.vba
 
 For index = 0 To VAR.GetUpperBound(0)
     With Selection.Find
-        .MatchCase = True
-        .MatchByte = True
-        .IgnoreSpace = False
-        .IgnorePunct = False
         .Text = VAR(index, 0)
         .Replacement.Text = VAR(index, 1)
         .Execute Replace:=wdReplaceOne
@@ -275,10 +281,6 @@ Next
 
 For index = 0 To VAR.GetUpperBound(0)
     With Selection.Find
-        .MatchCase = True
-        .MatchByte = True
-        .IgnoreSpace = False
-        .IgnorePunct = False
         .Text = VAR(index, 0)
         Do While .Execute
             Selection.Range.Text = VAR(index, 1)
@@ -290,10 +292,6 @@ Next
 @@ subst_dumb.vba
 
 With Selection.Find
-    .MatchCase = True
-    .MatchByte = True
-    .IgnoreSpace = False
-    .IgnorePunct = False
     .Text = TARGET
     .Replacement.Text = REPLACEMENT
     .Execute Replace:=wdReplaceOne
@@ -303,10 +301,6 @@ Selection.Collapse Direction:=wdCollapseEnd
 @@ subst_dumb2.vba
 
 With Selection.Find
-    .MatchCase = True
-    .MatchByte = True
-    .IgnoreSpace = False
-    .IgnorePunct = False
     .Text = TARGET
     if .Execute Then
         Selection.Range.Text = REPLACEMENT
