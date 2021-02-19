@@ -25,8 +25,9 @@ use Moo;
 
 has debug     => ( is => 'ro' );
 has verbose   => ( is => 'ro', default => 1 );
-has format    => ( is => 'ro', default => 'default' );
-has pretty    => ( is => 'ro', default => 2 );
+has format    => ( is => 'ro', default => 'dumb' );
+has subname   => ( is => 'ro', default => 'Patch' );
+has pretty    => ( is => 'ro', default => undef );
 has fold      => ( is => 'rw', default => 72 );
 has boundary  => ( is => 'ro', default => 'word' );
 has linebreak => ( is => 'ro', default => LINEBREAK_ALL );
@@ -48,6 +49,7 @@ sub run {
 	debug
 	verbose | v !
 	format      =s
+	subname     =s
 	pretty      !
 	fold        :72
 	margin      =i
@@ -64,7 +66,7 @@ sub run {
 }
 
 my %driver = (
-    default => sub {
+    array => sub {
 	my $app = shift;
 	my @fromto = @_;
 	my $dim = 
@@ -119,7 +121,7 @@ sub process_file {
 	}
     }
 
-    print "Sub Patch()\n\n";
+    printf "Sub %s()\n\n", $app->subname;
     print $app->section("setup.vba");
     $driver{$app->format || 'default'}->($app, @fromto);
     print "End Sub\n";

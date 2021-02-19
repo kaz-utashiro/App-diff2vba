@@ -25,7 +25,7 @@ $(ALL): Makefile
 clean:
 	rm -f $(ALL) $(SJIS)
 
-GREPLE = greple -Mmsdoc -Msubst --check=any
+GREPLE = greple --norc -Mmsdoc -Msubst --check=any
 DIFF2VBA = perl -I../lib ../script/diff2vba
 
 %.diff: %.docx
@@ -36,20 +36,20 @@ DIFF2VBA = perl -I../lib ../script/diff2vba
 
 
 %.stat: %.docx
-	$(GREPLE) --all-sample-dict --stat $< > $@
+	TERM_BGCOLOR=555 $(GREPLE) --color=always --all-sample-dict --stat $< > $@
 
 
 %.patch: %.diff
-	$(DIFF2VBA) --no-pretty $< > $@
+	$(DIFF2VBA) --no-pretty --format=array $< > $@
 
 %.pretty-patch: %.diff
-	$(DIFF2VBA) --pretty $< > $@
+	$(DIFF2VBA) --pretty --format=array $< > $@
 
 %.small-patch: %.small-diff
-	$(DIFF2VBA) --no-pretty $< > $@
+	$(DIFF2VBA) --no-pretty --format=array $< > $@
 
 %.small-pretty-patch: %.small-diff
-	$(DIFF2VBA) --pretty $< > $@
+	$(DIFF2VBA) --pretty --format=array $< > $@
 
 %.dumb-patch: %.diff
 	$(DIFF2VBA) --no-pretty --format=dumb $< > $@
