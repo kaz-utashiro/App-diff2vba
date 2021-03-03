@@ -17,6 +17,7 @@ use Pod::Usage;
 use Text::ANSI::Fold qw(:constants);
 use Text::VisualPrintf qw(vprintf vsprintf);
 use Data::Section::Simple qw(get_data_section);
+use List::Util qw(max);
 use List::MoreUtils qw(pairwise);
 use App::diff2vba::Util;
 use App::sdif::Util;
@@ -65,6 +66,31 @@ sub run {
     }
 }
 
+sub subst_dumb {
+    my $script = shift;
+    sub {
+	my $app = shift;
+	my @fromto = @_;
+	for my $fromto (@fromto) {
+	    use integer;
+	    my($s_from, $s_to) = @$fromto;
+	    my $max = 250;
+	    my $longer = max(map length, $s_from, $s_to);
+	    my $count = ($longer + $max - 1) / $max;
+	    my($from_len, $to_len) = map { (length($_) + $count - 1) / $count } $s_from, $s_to;
+	    while ($s_from ne '' or $s_to ne '') {
+		my($from, $to);
+		$s_from =~ s/\A((?:\X|.){0,$from_len})//s; $from = $1;
+		$s_to   =~ s/\A((?:\X|.){0,$to_len})//s; $to = $1;
+		next if $from eq $to;
+		print $app->section($script,
+				    { TARGET      => _continue($app->vba_string_literal($from)),
+				      REPLACEMENT => _continue($app->vba_string_literal($to)) });
+	    }
+	}
+    };
+}
+
 my %driver = (
     array => sub {
 	my $app = shift;
@@ -75,16 +101,8 @@ my %driver = (
 	print _continue($dim), "\n";
 	print $app->section('subst_one.vba', { VAR => $app->variable } );
     },
-    dumb => sub {
-	my $app = shift;
-	my @fromto = @_;
-	for my $fromto (@fromto) {
-	    my($from, $to) = @$fromto;
-	    print $app->section('subst_dumb.vba',
-				{ TARGET      => _continue($app->vba_string_literal($from)),
-				  REPLACEMENT => _continue($app->vba_string_literal($to)) });
-	}
-    },
+    dumb  => subst_dumb('subst_dumb.vba'),
+    dumb2 => subst_dumb('subst_dumb2.vba'),
     );
 
 sub process_file {
@@ -297,8 +315,8 @@ With Selection.Find
     .Text = TARGET
     .Replacement.Text = REPLACEMENT
     .Execute Replace:=wdReplaceOne
+    Selection.Collapse Direction:=wdCollapseEnd
 End With
-Selection.Collapse Direction:=wdCollapseEnd
 
 @@ subst_dumb2.vba
 
