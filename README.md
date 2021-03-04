@@ -5,7 +5,7 @@ diff2vba - generate VBA patch script from diff output
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -18,18 +18,20 @@ greple -Mmsdoc -Msubst \\
 
 # OPTIONS
 
-- **--fold**\[=_width_\]
+- **--maxlen**=_n_
 
-    Fold string literals.  Default is 72.  Specify 0 not to fold.
+    Set maximum length of literal string.
+    Default is 250.
 
-- **--variable**=_name_
+- **--subname**=_name_
 
-    Specify array variable name.  Default is `subst`.
+    Set subroutine name in the VBA script.
+    Default is `Patch`.
 
-- **--**\[**no-**\]**pretty**
+- **--identical**
 
-    Default true and produce script with newlines and indentation for
-    human readability.  If disabled, produce concise data without them.
+    Produce patch script for identical string.
+    Default is false.
 
 # INSTALL
 

@@ -2,6 +2,11 @@ Revision history for Perl extension App-diff2vba
 
 {{$NEXT}}
 
+0.05 2021-03-04T04:26:16Z
+
+    - Update document.
+    - Produce count numbers.
+
 0.04 2021-03-04T02:36:40Z
 
     - Remove all pretty formatting portion.

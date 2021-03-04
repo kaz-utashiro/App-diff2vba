@@ -18,7 +18,7 @@ diff2vba - generate VBA patch script from diff output
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -33,18 +33,29 @@ B<diff2vba> is a command to generate VBA patch script from diff output.
 
 =over 7
 
-=item B<--fold>[=I<width>]
+=item B<--maxlen>=I<n>
 
-Fold string literals.  Default is 72.  Specify 0 not to fold.
+Set maximum length of literal string.
+Default is 250.
 
-=item B<--variable>=I<name>
+=begin comment
 
-Specify array variable name.  Default is C<subst>.
+=item B<--format>=I<format>
 
-=item B<-->[B<no->]B<pretty>
+Set format of VBA script.
+Default is C<dumb>.
 
-Default true and produce script with newlines and indentation for
-human readability.  If disabled, produce concise data without them.
+=end comment
+
+=item B<--subname>=I<name>
+
+Set subroutine name in the VBA script.
+Default is C<Patch>.
+
+=item B<--identical>
+
+Produce patch script for identical string.
+Default is false.
 
 =back
 

@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use utf8;
 use Encode;
@@ -61,14 +61,16 @@ sub substitute {
     my $app = shift;
     my $script = sprintf "subst_%s.vba", $app->format;
     my $max = $app->maxlen;
+    my $i = 0;
     for my $fromto (@_) {
 	use integer;
 	chomp @$fromto;
 	my($s_from, $s_to) = @$fromto;
 	my $longer = max(map length, $s_from, $s_to);
 	my $count = ($longer + $max - 1) / $max;
-	my @from = _split_string($s_from, $count);
-	my @to   = _split_string($s_to,   $count);
+	my @from = split_string($s_from, $count);
+	my @to   = split_string($s_to,   $count);
+	printf "' # %d\n\n", ++$i;
 	for my $i (0 .. $#from) {
 	    next if !$app->identical and $from[$i] eq $to[$i];
 	    print $app->section($script,
@@ -159,18 +161,6 @@ sub vba_string_literal {
 
 ######################################################################
 
-sub _split_string {
-    local $_ = shift;
-    my $count = shift;
-    my $len = int((length($_) + $count - 1) / $count);
-    my @split;
-    while (length) {
-	push @split, substr($_, 0, $len, '');
-    }
-    @split == $count or die;
-    @split;
-}
-
 1;
 
 =encoding utf-8
@@ -179,43 +169,20 @@ sub _split_string {
 
 App::diff2vba - generate VBA patch script from diff output
 
+=head1 VERSION
+
+Version 0.05
+
 =head1 SYNOPSIS
 
-greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
+greple -Mmsdoc -Msubst \
+    --all-sample-dict --diff some.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION
 
 B<diff2vba> is a command to generate VBA patch script from diff output.
 
-=head1 OPTIONS
-
-=over 7
-
-=item B<--maxlen>=I<n>
-
-Set maximum length of literal string.
-Default is 250.
-
-=begin comment
-
-=item B<--format>=I<format>
-
-Set format of VBA script.
-Default is C<dumb>.
-
-=end comment
-
-=item B<--subname>=I<name>
-
-Set subroutine name in the VBA script.
-Default is C<Patch>.
-
-=item B<--identical>
-
-Produce patch script for identical string.
-Default is false.
-
-=back
+Read document in script file for detail.
 
 =head1 AUTHOR
 
@@ -244,7 +211,7 @@ End With
 @@ subst_dumb.vba
 
 With Selection.Find
-    .Text = TARGET
+    .Text             = TARGET
     .Replacement.Text = REPLACEMENT
     .Execute Replace:=wdReplaceOne
 End With
