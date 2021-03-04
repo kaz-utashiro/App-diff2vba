@@ -235,6 +235,8 @@ With Selection.Find
     .IgnorePunct = False
 End With
 
+Options.AutoFormatAsYouTypeReplaceQuotes = False
+
 @@ subst_dumb.vba
 
 With Selection.Find
