@@ -91,7 +91,7 @@ sub tailfix {
 	    substr($b->[$i-1], -1, 1) . substr($b->[$i], 0, 2)) {
 	    $b->[$i-1] .= substr($b->[$i], 0, 2, '');
 	}
-	if (substr($b->[$i-1], -3, 3) eq
+	elsif (substr($b->[$i-1], -3, 3) eq
 	    substr($a->[$i-1], -1, 1) . substr($a->[$i], 0, 2)) {
 	    $a->[$i-1] .= substr($a->[$i], 0, 2, '');
 	}
