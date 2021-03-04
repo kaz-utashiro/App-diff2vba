@@ -5,7 +5,7 @@ diff2vba - generate VBA patch script from diff output
 
 # VERSION
 
-Version 0.06
+Version 0.07
 
 # SYNOPSIS
 
