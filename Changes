@@ -2,6 +2,12 @@ Revision history for Perl extension App-diff2vba
 
 {{$NEXT}}
 
+0.04 2021-03-04T02:36:40Z
+
+    - Remove all pretty formatting portion.
+    - Produce dumb output only.
+    - Add some options.
+
 0.03 2021-02-12T03:46:32Z
 
     - Move to Github Actions.

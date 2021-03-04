@@ -8,8 +8,6 @@ requires 'List::Util';
 requires 'List::MoreUtils';
 requires 'Moo';
 requires 'Pod::Usage';
-requires 'Text::ANSI::Fold';
-requires 'Text::VisualPrintf';
 requires 'perl', 'v5.14.0';
 
 on configure => sub {

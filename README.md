@@ -5,7 +5,7 @@ diff2vba - generate VBA patch script from diff output
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -37,11 +37,11 @@ cpanm https://github.com/kaz-utashiro/App-diff2vba.git
 
 # SEE ALSO
 
-[App::Greple](https://metacpan.org/pod/App%3A%3AGreple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
+[App::Greple](https://metacpan.org/pod/App::Greple), [https://github.com/kaz-utashiro/greple](https://github.com/kaz-utashiro/greple)
 
-[App::Greple::msdoc](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amsdoc), [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
+[App::Greple::msdoc](https://metacpan.org/pod/App::Greple::msdoc), [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
 
-[App::Greple::subst](https://metacpan.org/pod/App%3A%3AGreple%3A%3Asubst), [https://github.com/kaz-utashiro/greple-subst](https://github.com/kaz-utashiro/greple-subst)
+[App::Greple::subst](https://metacpan.org/pod/App::Greple::subst), [https://github.com/kaz-utashiro/greple-subst](https://github.com/kaz-utashiro/greple-subst)
 
 [https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415](https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415)
 

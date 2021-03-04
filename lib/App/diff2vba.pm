@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use utf8;
 use Encode;
@@ -14,8 +14,6 @@ use Data::Dumper;
 }
 use open IO => 'utf8', ':std';
 use Pod::Usage;
-use Text::ANSI::Fold qw(:constants);
-use Text::VisualPrintf qw(vprintf vsprintf);
 use Data::Section::Simple qw(get_data_section);
 use List::Util qw(max);
 use List::MoreUtils qw(pairwise);
@@ -28,14 +26,11 @@ has debug     => ( is => 'ro' );
 has verbose   => ( is => 'ro', default => 1 );
 has format    => ( is => 'ro', default => 'dumb' );
 has subname   => ( is => 'ro', default => 'Patch' );
-has pretty    => ( is => 'ro', default => undef );
-has fold      => ( is => 'rw', default => 72 );
-has boundary  => ( is => 'ro', default => 'word' );
-has linebreak => ( is => 'ro', default => LINEBREAK_ALL );
-has margin    => ( is => 'ro', default => 4 );
-has indent    => ( is => 'rw', default => 2 );
-has variable  => ( is => 'ro', default => "subst" );
-has connect   => ( is => 'rw', default => "\n" );
+has maxlen    => ( is => 'ro', default => 250 );
+has identical => ( is => 'ro', default => undef );
+has quotes    => ( is => 'rw',
+		   default => sub { { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" } } );
+has quotes_re => ( is => 'rw' );
 
 no Moo;
 
@@ -51,12 +46,8 @@ sub run {
 	verbose | v !
 	format      =s
 	subname     =s
-	pretty      !
-	fold        :72
-	margin      =i
-	indent      =i
-	variable    =s
-	connect     =s
+	maxlen      =i
+	identical   !
 	") || pod2usage();
 
     $app->initialize;
@@ -66,44 +57,26 @@ sub run {
     }
 }
 
-sub subst_dumb {
-    my $script = shift;
-    sub {
-	my $app = shift;
-	my @fromto = @_;
-	for my $fromto (@fromto) {
-	    use integer;
-	    my($s_from, $s_to) = @$fromto;
-	    my $max = 250;
-	    my $longer = max(map length, $s_from, $s_to);
-	    my $count = ($longer + $max - 1) / $max;
-	    my($from_len, $to_len) = map { (length($_) + $count - 1) / $count } $s_from, $s_to;
-	    while ($s_from ne '' or $s_to ne '') {
-		my($from, $to);
-		$s_from =~ s/\A((?:\X|.){0,$from_len})//s; $from = $1;
-		$s_to   =~ s/\A((?:\X|.){0,$to_len})//s; $to = $1;
-		next if $from eq $to;
-		print $app->section($script,
-				    { TARGET      => _continue($app->vba_string_literal($from)),
-				      REPLACEMENT => _continue($app->vba_string_literal($to)) });
-	    }
+sub substitute {
+    my $app = shift;
+    my $script = sprintf "subst_%s.vba", $app->format;
+    my $max = $app->maxlen;
+    for my $fromto (@_) {
+	use integer;
+	chomp @$fromto;
+	my($s_from, $s_to) = @$fromto;
+	my $longer = max(map length, $s_from, $s_to);
+	my $count = ($longer + $max - 1) / $max;
+	my @from = _split_string($s_from, $count);
+	my @to   = _split_string($s_to,   $count);
+	for my $i (0 .. $#from) {
+	    next if !$app->identical and $from[$i] eq $to[$i];
+	    print $app->section($script,
+				{ TARGET      => $app->vba_string_literal($from[$i]),
+				  REPLACEMENT => $app->vba_string_literal($to[$i]) });
 	}
-    };
+    }
 }
-
-my %driver = (
-    array => sub {
-	my $app = shift;
-	my @fromto = @_;
-	my $dim = 
-	    sprintf("Dim %s (,) As String = ", $app->variable) .
-	    $app->produce_array(@fromto);
-	print _continue($dim), "\n";
-	print $app->section('subst_one.vba', { VAR => $app->variable } );
-    },
-    dumb  => subst_dumb('subst_dumb.vba'),
-    dumb2 => subst_dumb('subst_dumb2.vba'),
-    );
 
 sub process_file {
     my $app = shift;
@@ -135,23 +108,20 @@ sub process_file {
 	    next if @lines != $column;
 	    next if $column != 2;
 
-	    push @fromto, $app->process_diff(read_unified_2 $fh, @lines);
+	    push @fromto, $app->read_diff($fh, @lines);
 	}
     }
 
     printf "Sub %s()\n\n", $app->subname;
     print $app->section("setup.vba");
-    $driver{$app->format || 'default'}->($app, @fromto);
+    $app->substitute(@fromto);
     print "End Sub\n";
 }
 
 sub initialize {
     my $app = shift;
-    if (not $app->pretty) {
-	$app->fold(0);
-	$app->indent(0);
-	$app->connect('');
-    }
+    my $chrs = join '', keys %{$app->quotes};
+    $app->quotes_re(qr/[\Q$chrs\E]/);
 }
 
 sub section {
@@ -165,10 +135,12 @@ sub section {
     $_;
 }
 
-sub process_diff {
+sub read_diff {
     my $app = shift;
+    my($fh, @lines) = @_;
+    my @diff = read_unified_2 $fh, @lines;
     my @out;
-    while (my($c, $o, $n) = splice(@_, 0, 3)) {
+    while (my($c, $o, $n) = splice(@diff, 0, 3)) {
 	@$o > 0 and @$o == @$n or next;
 	s/^[\t +-]// for @$c, @$o, @$n;
 	push @out, pairwise { [ $a, $b ] } @$o, @$n;
@@ -176,74 +148,27 @@ sub process_diff {
     @out;
 }
 
-sub produce_array {
-    my $app = shift;
-    my @pairs = map { $app->subst_pairs(@$_) } @_;
-    $app->enclose_list(@pairs);
-}
-
-sub subst_pairs {
-    my $app = shift;
-    my($o, $n) = @_;
-    my $s;
-    my $indent = ' ' x $app->indent;
-    $app->enclose_list($app->vba_string_literal($o),
-		       $app->vba_string_literal($n));
-}
-
 sub vba_string_literal {
     my $app = shift;
-    chomp(my $s = shift);
-    return sprintf qq'"%s"', _vba_string($s) unless $app->fold;
-    state $fold = $app->fold_obj;
-    my @s = do {
-	map { qq'"$_"' }
-	map { _vba_string($_) }
-	$fold->text($s)->chops;
-    };
-    my $width = $app->fold + $app->margin + length('""');
-    join("\n",
-	 map({ vsprintf "%-*s &", $width, $_ } splice @s, 0, -1),
-	 @s);
-}
-
-sub fold_obj {
-    my $app = shift;
-    Text::ANSI::Fold->new(width     => $app->fold,
-			  boundary  => $app->boundary,
-			  linebreak => $app->linebreak,
-			  runin     => $app->margin,
-			  runout    => $app->margin);
-}
-
-sub enclose_list {
-    my $app = shift;
-    my $c = $app->connect;
-    join($c, "{", $app->indent_text(join($c, _join_list(",", @_))), "}");
-}
-
-sub indent_text {
-    my $app = shift;
-    my $indent = ' ' x $app->indent;
-    $_[0] =~ s/^/$indent/mgr;
+    my $quotes = $app->quotes;
+    my $chrs_re = $app->quotes_re;
+    join(' & ',
+	 map { $quotes->{$_} || sprintf('"%s"', s/\"/\"\"/gr) }
+	 map { split /($chrs_re)/ } @_);
 }
 
 ######################################################################
 
-sub _vba_string {
+sub _split_string {
     local $_ = shift;
-    s/"/""/g;
-    $_;
-}
-
-sub _join_list {
-    my $by = shift;
-    return () if @_ < 1;
-    (shift, map { ( $by, $_ ) } @_);
-}
-
-sub _continue {
-    $_[0] =~ s/\n/ _\n/gr;
+    my $count = shift;
+    my $len = int((length($_) + $count - 1) / $count);
+    my @split;
+    while (length) {
+	push @split, substr($_, 0, $len, '');
+    }
+    @split == $count or die;
+    @split;
 }
 
 1;
@@ -256,11 +181,41 @@ App::diff2vba - generate VBA patch script from diff output
 
 =head1 SYNOPSIS
 
-    greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
+greple -Msubst --diff old.docx new.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION
 
 B<diff2vba> is a command to generate VBA patch script from diff output.
+
+=head1 OPTIONS
+
+=over 7
+
+=item B<--maxlen>=I<n>
+
+Set maximum length of literal string.
+Default is 250.
+
+=begin comment
+
+=item B<--format>=I<format>
+
+Set format of VBA script.
+Default is C<dumb>.
+
+=end comment
+
+=item B<--subname>=I<name>
+
+Set subroutine name in the VBA script.
+Default is C<Patch>.
+
+=item B<--identical>
+
+Produce patch script for identical string.
+Default is false.
+
+=back
 
 =head1 AUTHOR
 
@@ -286,37 +241,14 @@ With Selection.Find
     .IgnorePunct = False
 End With
 
-@@ subst_one.vba
-
-For index = 0 To VAR.GetUpperBound(0)
-    With Selection.Find
-        .Text = VAR(index, 0)
-        .Replacement.Text = VAR(index, 1)
-        .Execute Replace:=wdReplaceOne
-    End With
-    Selection.Collapse Direction:=wdCollapseEnd
-Next
-
-@@ subst_all.vba
-
-For index = 0 To VAR.GetUpperBound(0)
-    With Selection.Find
-        .Text = VAR(index, 0)
-        Do While .Execute
-            Selection.Range.Text = VAR(index, 1)
-        Loop
-    End With    
-    Selection.Collapse Direction:=wdCollapseEnd
-Next
-
 @@ subst_dumb.vba
 
 With Selection.Find
     .Text = TARGET
     .Replacement.Text = REPLACEMENT
     .Execute Replace:=wdReplaceOne
-    Selection.Collapse Direction:=wdCollapseEnd
 End With
+Selection.Collapse Direction:=wdCollapseEnd
 
 @@ subst_dumb2.vba
 
