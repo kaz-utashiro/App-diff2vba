@@ -2,6 +2,10 @@ Revision history for Perl extension App-diff2vba
 
 {{$NEXT}}
 
+0.06 2021-03-04T05:00:59Z
+
+    - Arrange off-by-one or two strings.
+
 0.05 2021-03-04T04:26:16Z
 
     - Update document.

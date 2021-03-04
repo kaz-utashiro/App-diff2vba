@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use utf8;
 use Encode;
@@ -70,12 +70,39 @@ sub substitute {
 	my $count = ($longer + $max - 1) / $max;
 	my @from = split_string($s_from, $count);
 	my @to   = split_string($s_to,   $count);
+	tailfix(\@from, \@to);
 	printf "' # %d\n\n", ++$i;
 	for my $i (0 .. $#from) {
 	    next if !$app->identical and $from[$i] eq $to[$i];
 	    print $app->section($script,
 				{ TARGET      => $app->vba_string_literal($from[$i]),
 				  REPLACEMENT => $app->vba_string_literal($to[$i]) });
+	}
+    }
+}
+
+sub tailfix {
+    my($a, $b) = @_;
+    return if @$a < 1;
+    # not elegant, but ...
+    for my $i (1 .. $#{$a}) {
+	# off by 2
+	if (substr($a->[$i-1], -3, 3) eq
+	    substr($b->[$i-1], -1, 1) . substr($b->[$i], 0, 2)) {
+	    $b->[$i-1] .= substr($b->[$i], 0, 2, '');
+	}
+	if (substr($b->[$i-1], -3, 3) eq
+	    substr($a->[$i-1], -1, 1) . substr($a->[$i], 0, 2)) {
+	    $a->[$i-1] .= substr($a->[$i], 0, 2, '');
+	}
+	# off by 1
+	elsif (substr($a->[$i-1], -2, 2) eq
+	    substr($b->[$i-1], -1, 1) . substr($b->[$i], 0, 1)) {
+	    $b->[$i-1] .= substr($b->[$i], 0, 1, '');
+	}
+	elsif (substr($b->[$i-1], -2, 2) eq
+	    substr($a->[$i-1], -1, 1) . substr($a->[$i], 0, 1)) {
+	    $a->[$i-1] .= substr($a->[$i], 0, 1, '');
 	}
     }
 }
@@ -171,7 +198,7 @@ App::diff2vba - generate VBA patch script from diff output
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
