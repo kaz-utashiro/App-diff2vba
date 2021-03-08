@@ -18,12 +18,14 @@ diff2vba - generate VBA patch script from diff output
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =head1 SYNOPSIS
 
-greple -Mmsdoc -Msubst \
-    --all-sample-dict --diff some.docx | diff2vba > patch.vba
+  optex -Mtextconf diff -u A.docx B.docx | diff2vba > patch.vba
+
+  greple -Mmsdoc -Msubst \
+      --all-sample-dict --diff some.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION
 
@@ -35,8 +37,15 @@ B<diff2vba> is a command to generate VBA patch script from diff output.
 
 =item B<--maxlen>=I<n>
 
-Set maximum length of literal string.
-Default is 250.
+Because VBA script does not accept string longer than 255 characters,
+longer string have to be splitted into shorter ones.  This option
+specifies maximum length.  Default is 250.
+
+=item B<--adjust>=I<n>
+
+Adjust border when the splitted strings are slightly different.
+Default value is 2, so they are adjusted upto two characters.  Set
+zero to disable it.
 
 =begin comment
 
@@ -57,6 +66,10 @@ Default is C<Patch>.
 Produce patch script for identical string.
 Default is false.
 
+=item B<--reverse>
+
+Generate reverse order patch.
+
 =back
 
 =head1 INSTALL
@@ -70,6 +83,8 @@ L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
 L<App::Greple::msdoc>, L<https://github.com/kaz-utashiro/greple-msdoc>
 
 L<App::Greple::subst>, L<https://github.com/kaz-utashiro/greple-subst>
+
+L<App::optex::textconv>, L<https://github.com/kaz-utashiro/optex-textconv>
 
 L<https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415>
 

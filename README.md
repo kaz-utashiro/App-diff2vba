@@ -5,12 +5,14 @@ diff2vba - generate VBA patch script from diff output
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
-greple -Mmsdoc -Msubst \\
-    --all-sample-dict --diff some.docx | diff2vba > patch.vba
+    optex -Mtextconf diff -u A.docx B.docx | diff2vba > patch.vba
+
+    greple -Mmsdoc -Msubst \
+        --all-sample-dict --diff some.docx | diff2vba > patch.vba
 
 # DESCRIPTION
 
@@ -20,8 +22,15 @@ greple -Mmsdoc -Msubst \\
 
 - **--maxlen**=_n_
 
-    Set maximum length of literal string.
-    Default is 250.
+    Because VBA script does not accept string longer than 255 characters,
+    longer string have to be splitted into shorter ones.  This option
+    specifies maximum length.  Default is 250.
+
+- **--adjust**=_n_
+
+    Adjust border when the splitted strings are slightly different.
+    Default value is 2, so they are adjusted upto two characters.  Set
+    zero to disable it.
 
 - **--subname**=_name_
 
@@ -32,6 +41,10 @@ greple -Mmsdoc -Msubst \\
 
     Produce patch script for identical string.
     Default is false.
+
+- **--reverse**
+
+    Generate reverse order patch.
 
 # INSTALL
 
@@ -44,6 +57,8 @@ cpanm https://github.com/kaz-utashiro/App-diff2vba.git
 [App::Greple::msdoc](https://metacpan.org/pod/App::Greple::msdoc), [https://github.com/kaz-utashiro/greple-msdoc](https://github.com/kaz-utashiro/greple-msdoc)
 
 [App::Greple::subst](https://metacpan.org/pod/App::Greple::subst), [https://github.com/kaz-utashiro/greple-subst](https://github.com/kaz-utashiro/greple-subst)
+
+[App::optex::textconv](https://metacpan.org/pod/App::optex::textconv), [https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
 
 [https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415](https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415)
 
