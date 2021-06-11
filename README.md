@@ -9,7 +9,7 @@ Version 0.08
 
 # SYNOPSIS
 
-    optex -Mtextconf diff -u A.docx B.docx | diff2vba > patch.vba
+    optex -Mtextconv diff -u A.docx B.docx | diff2vba > patch.vba
 
     greple -Mmsdoc -Msubst \
         --all-sample-dict --diff some.docx | diff2vba > patch.vba
@@ -60,6 +60,7 @@ cpanm https://github.com/kaz-utashiro/App-diff2vba.git
 
 [App::optex::textconv](https://metacpan.org/pod/App::optex::textconv), [https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
 
+[https://qiita.com/kaz-utashiro/items/06c60843213b0f024df7](https://qiita.com/kaz-utashiro/items/06c60843213b0f024df7),
 [https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415](https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415)
 
 # AUTHOR

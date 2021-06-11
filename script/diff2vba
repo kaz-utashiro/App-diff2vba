@@ -22,7 +22,7 @@ Version 0.08
 
 =head1 SYNOPSIS
 
-  optex -Mtextconf diff -u A.docx B.docx | diff2vba > patch.vba
+  optex -Mtextconv diff -u A.docx B.docx | diff2vba > patch.vba
 
   greple -Mmsdoc -Msubst \
       --all-sample-dict --diff some.docx | diff2vba > patch.vba
@@ -86,6 +86,7 @@ L<App::Greple::subst>, L<https://github.com/kaz-utashiro/greple-subst>
 
 L<App::optex::textconv>, L<https://github.com/kaz-utashiro/optex-textconv>
 
+L<https://qiita.com/kaz-utashiro/items/06c60843213b0f024df7>,
 L<https://qiita.com/kaz-utashiro/items/85add653a71a7e01c415>
 
 =head1 AUTHOR

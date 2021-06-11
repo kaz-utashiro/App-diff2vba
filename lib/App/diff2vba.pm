@@ -137,7 +137,6 @@ sub substitute {
 	    @{$app->TABLE};
 	}
     };
-    my @out;
     for my $i (0 .. $#fromto) {
 	my $fromto = $fromto[$i];
 	use integer;
