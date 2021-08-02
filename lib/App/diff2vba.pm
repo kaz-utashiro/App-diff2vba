@@ -20,24 +20,23 @@ use List::MoreUtils qw(pairwise);
 use App::diff2vba::Util;
 use App::sdif::Util;
 
-use Moo;
+use Getopt::EX::Hashed;
 
-has debug     => ( is => 'ro' );
-has verbose   => ( is => 'ro', default => 1 );
-has format    => ( is => 'ro', default => 'dumb' );
-has subname   => ( is => 'ro', default => 'Patch' );
-has maxlen    => ( is => 'ro', default => 250 );
-has adjust    => ( is => 'ro', default => 2 );
-has identical => ( is => 'ro', default => undef );
-has reverse   => ( is => 'ro', default => undef );
+has debug     => spec => "      " ;
+has verbose   => spec => " v !  " , default => 1;
+has format    => spec => "   =s " , default => 'dumb';
+has subname   => spec => "   =s " , default => 'Patch';
+has maxlen    => spec => "   =i " , default => 250;
+has adjust    => spec => "   =i " , default => 2;
+has identical => spec => "   !  " ;
+has reverse   => spec => "   !  " ;
 
-has SCRIPT    => ( is => 'rw' );
-has TABLE     => ( is => 'rw' );
-has QUOTES    => ( is => 'rw',
-		   default => sub { { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" } } );
-has QUOTES_RE => ( is => 'rw' );
+has SCRIPT    => ;
+has TABLE     => ;
+has QUOTES    => default => { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" };
+has QUOTES_RE => ;
 
-no Moo;
+no Getopt::EX::Hashed;
 
 sub run {
     my $app = shift;
@@ -46,16 +45,7 @@ sub run {
     use Getopt::EX::Long qw(GetOptions Configure ExConfigure);
     ExConfigure BASECLASS => [ __PACKAGE__, "Getopt::EX" ];
     Configure qw(bundling no_getopt_compat);
-    GetOptions($app, make_options "
-	debug
-	verbose | v !
-	format      =s
-	subname     =s
-	maxlen      =i
-	adjust      =i
-	identical   !
-	reverse     !
-	") || pod2usage();
+    $app->getopt || pod2usage();
 
     $app->initialize;
 
@@ -70,7 +60,7 @@ sub read {
 
     open my $fh, $file or die "$file: $!\n";
 
-    $app->TABLE(my $fromto = []);
+    my $fromto = $app->{TABLE} = [];
     while (<$fh>) {
 	#
 	# diff --combined (generic)
@@ -110,7 +100,7 @@ sub patch {
 
 sub prologue {
     my $app = shift;
-    if (my $name = $app->subname) {
+    if (my $name = $app->{subname}) {
 	$app->append(text => "Sub $name()\n");
     }
     $app->append(section => "setup.vba");
@@ -119,7 +109,7 @@ sub prologue {
 
 sub epilogue {
     my $app = shift;
-    if (my $name = $app->subname) {
+    if (my $name = $app->{subname}) {
 	$app->append(text => "End Sub\n");
     }
     $app;
@@ -127,14 +117,14 @@ sub epilogue {
 
 sub substitute {
     my $app = shift;
-    my $template = sprintf "subst_%s.vba", $app->format;
-    my $max = $app->maxlen;
+    my $template = sprintf "subst_%s.vba", $app->{format};
+    my $max = $app->{maxlen};
 
     my @fromto = do {
-	if ($app->reverse) {
-	    map { [ $_->[1], $_->[0] ] } @{$app->TABLE}
+	if ($app->{reverse}) {
+	    map { [ $_->[1], $_->[0] ] } @{$app->{TABLE}};
 	} else {
-	    @{$app->TABLE};
+	    @{$app->{TABLE}};
 	}
     };
     for my $i (0 .. $#fromto) {
@@ -146,9 +136,9 @@ sub substitute {
 	my $count = ($longer + $max - 1) / $max;
 	my @from = split_string($from, $count);
 	my @to   = split_string($to,   $count);
-	adjust_border(\@from, \@to, $app->adjust) if $app->adjust;
+	adjust_border(\@from, \@to, $app->{adjust}) if $app->{adjust};
 	for my $j (0 .. $#from) {
-	    next if !$app->identical and $from[$j] eq $to[$j];
+	    next if !$app->{identical} and $from[$j] eq $to[$j];
 	    $app->append(text => sprintf "' # %d-%d\n", $i + 1, $j + 1);
 	    $app->append(section => $template,
 			 { TARGET      => $app->string_literal($from[$j]),
@@ -160,8 +150,8 @@ sub substitute {
 
 sub initialize {
     my $app = shift;
-    my $chrs = join '', keys %{$app->QUOTES};
-    $app->QUOTES_RE(qr/[\Q$chrs\E]/);
+    my $chrs = join '', keys %{$app->{QUOTES}};
+    $app->{QUOTES_RE} = qr/[\Q$chrs\E]/;
     $app;
 }
 
@@ -169,20 +159,20 @@ sub append {
     my $app = shift;
     my $what = shift // 'text';
     if      ($what eq 'text') {
-	push @{$app->SCRIPT}, @_;
+	push @{$app->{SCRIPT}}, @_;
     } elsif ($what eq 'section') {
-	push @{$app->SCRIPT}, $app->section(@_);
+	push @{$app->{SCRIPT}}, $app->section(@_);
     } else { die }
     $app;
 }
 
 sub write {
     my $app = shift;
-    join "\n", @{$app->SCRIPT};
+    join "\n", @{$app->{SCRIPT}};
 }
 
 sub reset {
-    (my $app = shift)->SCRIPT([]);
+    (my $app = shift)->{SCRIPT} = [];
     $app;
 }
 
@@ -213,8 +203,8 @@ sub read_diff {
 
 sub string_literal {
     my $app = shift;
-    my $quotes  = $app->QUOTES;
-    my $chrs_re = $app->QUOTES_RE;
+    my $quotes  = $app->{QUOTES};
+    my $chrs_re = $app->{QUOTES_RE};
     join(' & ',
 	 map { $quotes->{$_} || sprintf('"%s"', s/\"/\"\"/gr) }
 	 map { split /($chrs_re)/ } @_);

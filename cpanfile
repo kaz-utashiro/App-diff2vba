@@ -4,9 +4,9 @@ requires 'App::sdif';
 requires 'Data::Section::Simple';
 requires 'Encode';
 requires 'Getopt::EX::Long';
+requires 'Getopt::EX::Hashed', '0.9906';
 requires 'List::Util';
 requires 'List::MoreUtils';
-requires 'Moo';
 requires 'Pod::Usage';
 requires 'perl', 'v5.14.0';
 
