@@ -2,6 +2,10 @@ Revision history for Perl extension App-diff2vba
 
 {{$NEXT}}
 
+0.09 2021-11-20T04:25:18Z
+
+    - Use Getopt::EX::Hashed.
+
 0.08 2021-03-08T06:56:03Z
 
     - Add --adjust option to set border adjustment width.
