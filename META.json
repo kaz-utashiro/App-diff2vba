@@ -47,7 +47,7 @@
             "App::sdif" : "0",
             "Data::Section::Simple" : "0",
             "Encode" : "0",
-            "Getopt::EX::Hashed" : "0.9906",
+            "Getopt::EX::Hashed" : "1.03",
             "Getopt::EX::Long" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",

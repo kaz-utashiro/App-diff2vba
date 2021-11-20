@@ -1,12 +1,10 @@
 #!/usr/bin/env perl
 
-use v5.14;
+use strict;
 use warnings;
-use App::diff2vba;
 
-App::diff2vba->new->run(splice @ARGV);
-
-exit;
+use  App::diff2vba;
+exit App::diff2vba->new->run(splice @ARGV);
 
 __END__
 
@@ -16,16 +14,16 @@ __END__
 
 diff2vba - generate VBA patch script from diff output
 
-=head1 VERSION
-
-Version 0.08
-
 =head1 SYNOPSIS
 
   optex -Mtextconv diff -u A.docx B.docx | diff2vba > patch.vba
 
   greple -Mmsdoc -Msubst \
       --all-sample-dict --diff some.docx | diff2vba > patch.vba
+
+=head1 VERSION
+
+Version 0.08
 
 =head1 DESCRIPTION
 

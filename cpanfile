@@ -4,7 +4,7 @@ requires 'App::sdif';
 requires 'Data::Section::Simple';
 requires 'Encode';
 requires 'Getopt::EX::Long';
-requires 'Getopt::EX::Hashed', '0.9906';
+requires 'Getopt::EX::Hashed', '1.03';
 requires 'List::Util';
 requires 'List::MoreUtils';
 requires 'Pod::Usage';

@@ -20,23 +20,36 @@ use List::MoreUtils qw(pairwise);
 use App::diff2vba::Util;
 use App::sdif::Util;
 
-use Getopt::EX::Hashed;
+use Getopt::EX::Hashed 1.03; {
 
-has debug     => spec => "      " ;
-has verbose   => spec => " v !  " , default => 1;
-has format    => spec => "   =s " , default => 'dumb';
-has subname   => spec => "   =s " , default => 'Patch';
-has maxlen    => spec => "   =i " , default => 250;
-has adjust    => spec => "   =i " , default => 2;
-has identical => spec => "   !  " ;
-has reverse   => spec => "   !  " ;
+    has debug     => "      " ;
+    has verbose   => " v !  " , default => 1;
+    has format    => "   =s " , default => 'dumb';
+    has subname   => "   =s " , default => 'Patch';
+    has maxlen    => "   =i " , default => 250;
+    has adjust    => "   =i " , default => 2;
+    has identical => "   !  " ;
+    has reverse   => "   !  " ;
+    has help      => "      " ;
+    has version   => "      " ;
 
-has SCRIPT    => ;
-has TABLE     => ;
-has QUOTES    => default => { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" };
-has QUOTES_RE => ;
+    has SCRIPT    => ;
+    has TABLE     => ;
+    has QUOTES    => default => { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" };
+    has QUOTES_RE => ;
 
-no Getopt::EX::Hashed;
+    has '+help' => sub {
+	pod2usage
+	    -verbose  => 99,
+	    -sections => [ qw(SYNOPSIS VERSION) ];
+    };
+
+    has '+version' => sub {
+	print "Version: $VERSION\n";
+	exit;
+    };
+
+} no Getopt::EX::Hashed;
 
 sub run {
     my $app = shift;
@@ -52,6 +65,8 @@ sub run {
     for my $file (@ARGV ? @ARGV : '-') {
 	print $app->reset->read($file)->patch->write;
     }
+
+    return 0;
 }
 
 sub read {
@@ -250,7 +265,7 @@ Version 0.08
 
 =head1 SYNOPSIS
 
-greple -Mmsdoc -Msubst \
+  greple -Mmsdoc -Msubst \
     --all-sample-dict --diff some.docx | diff2vba > patch.vba
 
 =head1 DESCRIPTION

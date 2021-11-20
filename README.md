@@ -3,16 +3,16 @@
 
 diff2vba - generate VBA patch script from diff output
 
-# VERSION
-
-Version 0.08
-
 # SYNOPSIS
 
     optex -Mtextconv diff -u A.docx B.docx | diff2vba > patch.vba
 
     greple -Mmsdoc -Msubst \
         --all-sample-dict --diff some.docx | diff2vba > patch.vba
+
+# VERSION
+
+Version 0.08
 
 # DESCRIPTION
 
