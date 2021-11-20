@@ -22,6 +22,8 @@ use App::sdif::Util;
 
 use Getopt::EX::Hashed 1.03; {
 
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'ro' ] );
+
     has debug     => "      " ;
     has verbose   => " v !  " , default => 1;
     has format    => "   =s " , default => 'dumb';
@@ -33,11 +35,6 @@ use Getopt::EX::Hashed 1.03; {
     has help      => "      " ;
     has version   => "      " ;
 
-    has SCRIPT    => ;
-    has TABLE     => ;
-    has QUOTES    => default => { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" };
-    has QUOTES_RE => ;
-
     has '+help' => sub {
 	pod2usage
 	    -verbose  => 99,
@@ -48,6 +45,13 @@ use Getopt::EX::Hashed 1.03; {
 	print "Version: $VERSION\n";
 	exit;
     };
+
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
+
+    has SCRIPT    => ;
+    has TABLE     => ;
+    has QUOTES    => default => { '“' => "Chr(&H8167)", '”' => "Chr(&H8168)" };
+    has QUOTES_RE => ;
 
 } no Getopt::EX::Hashed;
 
@@ -75,7 +79,7 @@ sub read {
 
     open my $fh, $file or die "$file: $!\n";
 
-    my $fromto = $app->{TABLE} = [];
+    $app->TABLE(my $fromto = []);
     while (<$fh>) {
 	#
 	# diff --combined (generic)
@@ -94,7 +98,7 @@ sub read {
 		$_ eq ' ' ? 1 : int $_
 	    } $lines =~ /\d+(?|,(\d+)|( ))/g;
 
-	    warn $_ if $app->{debug};
+	    warn $_ if $app->debug;
 
 	    next if @lines != $column;
 	    next if $column != 2;
@@ -115,7 +119,7 @@ sub patch {
 
 sub prologue {
     my $app = shift;
-    if (my $name = $app->{subname}) {
+    if (my $name = $app->subname) {
 	$app->append(text => "Sub $name()\n");
     }
     $app->append(section => "setup.vba");
@@ -124,7 +128,7 @@ sub prologue {
 
 sub epilogue {
     my $app = shift;
-    if (my $name = $app->{subname}) {
+    if (my $name = $app->subname) {
 	$app->append(text => "End Sub\n");
     }
     $app;
@@ -132,14 +136,14 @@ sub epilogue {
 
 sub substitute {
     my $app = shift;
-    my $template = sprintf "subst_%s.vba", $app->{format};
-    my $max = $app->{maxlen};
+    my $template = sprintf "subst_%s.vba", $app->format;
+    my $max = $app->maxlen;
 
     my @fromto = do {
-	if ($app->{reverse}) {
-	    map { [ $_->[1], $_->[0] ] } @{$app->{TABLE}};
+	if ($app->reverse) {
+	    map { [ $_->[1], $_->[0] ] } @{$app->TABLE};
 	} else {
-	    @{$app->{TABLE}};
+	    @{$app->TABLE};
 	}
     };
     for my $i (0 .. $#fromto) {
@@ -151,9 +155,9 @@ sub substitute {
 	my $count = ($longer + $max - 1) / $max;
 	my @from = split_string($from, $count);
 	my @to   = split_string($to,   $count);
-	adjust_border(\@from, \@to, $app->{adjust}) if $app->{adjust};
+	adjust_border(\@from, \@to, $app->adjust) if $app->adjust;
 	for my $j (0 .. $#from) {
-	    next if !$app->{identical} and $from[$j] eq $to[$j];
+	    next if !$app->identical and $from[$j] eq $to[$j];
 	    $app->append(text => sprintf "' # %d-%d\n", $i + 1, $j + 1);
 	    $app->append(section => $template,
 			 { TARGET      => $app->string_literal($from[$j]),
@@ -165,8 +169,8 @@ sub substitute {
 
 sub initialize {
     my $app = shift;
-    my $chrs = join '', keys %{$app->{QUOTES}};
-    $app->{QUOTES_RE} = qr/[\Q$chrs\E]/;
+    my $chrs = join '', keys %{$app->QUOTES};
+    $app->QUOTES_RE(qr/[\Q$chrs\E]/);
     $app;
 }
 
@@ -174,20 +178,20 @@ sub append {
     my $app = shift;
     my $what = shift // 'text';
     if      ($what eq 'text') {
-	push @{$app->{SCRIPT}}, @_;
+	push @{$app->SCRIPT}, @_;
     } elsif ($what eq 'section') {
-	push @{$app->{SCRIPT}}, $app->section(@_);
+	push @{$app->SCRIPT}, $app->section(@_);
     } else { die }
     $app;
 }
 
 sub write {
     my $app = shift;
-    join "\n", @{$app->{SCRIPT}};
+    join "\n", @{$app->SCRIPT};
 }
 
 sub reset {
-    (my $app = shift)->{SCRIPT} = [];
+    (my $app = shift)->SCRIPT([]);
     $app;
 }
 
@@ -218,8 +222,8 @@ sub read_diff {
 
 sub string_literal {
     my $app = shift;
-    my $quotes  = $app->{QUOTES};
-    my $chrs_re = $app->{QUOTES_RE};
+    my $quotes  = $app->QUOTES;
+    my $chrs_re = $app->QUOTES_RE;
     join(' & ',
 	 map { $quotes->{$_} || sprintf('"%s"', s/\"/\"\"/gr) }
 	 map { split /($chrs_re)/ } @_);
