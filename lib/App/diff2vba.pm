@@ -18,7 +18,7 @@ use Data::Section::Simple qw(get_data_section);
 use List::Util qw(max);
 use List::MoreUtils qw(pairwise);
 use App::diff2vba::Util;
-use App::sdif::Util;
+use App::sdif::Util qw(read_unified_2);
 
 use Getopt::EX::Hashed 1.03; {
 
@@ -67,13 +67,13 @@ sub run {
     $app->initialize;
 
     for my $file (@ARGV ? @ARGV : '-') {
-	print $app->reset->read($file)->patch->write;
+	print $app->reset->load($file)->vba->script;
     }
 
     return 0;
 }
 
-sub read {
+sub load {
     my $app = shift;
     my $file = shift;
 
@@ -109,12 +109,11 @@ sub read {
     $app;
 }
 
-sub patch {
+sub vba {
     (my $app = shift)
 	->prologue()
 	->substitute()
 	->epilogue();
-    $app;
 }
 
 sub prologue {
@@ -185,7 +184,7 @@ sub append {
     $app;
 }
 
-sub write {
+sub script {
     my $app = shift;
     join "\n", @{$app->SCRIPT};
 }
@@ -215,7 +214,7 @@ sub read_diff {
     while (my($c, $o, $n) = splice(@diff, 0, 3)) {
 	@$o > 0 and @$o == @$n or next;
 	s/^[\t +-]// for @$c, @$o, @$n;
-	CORE::push @out, pairwise { [ $a, $b ] } @$o, @$n;
+	push @out, pairwise { [ $a, $b ] } @$o, @$n;
     }
     @out;
 }

@@ -1,10 +1,9 @@
-name = "App-diff2vba"
-readme_from = "script/diff2vba"
-#badges = ['github-actions/test', 'metacpan']
-badges = ['github-actions/test']
-authority="cpan:UTASHIRO"
+name           = "App-diff2vba"
+readme_from    = "script/diff2vba"
+badges         = [ 'github-actions/test', 'metacpan' ]
+authority      = "cpan:UTASHIRO"
 
-module_maker="ModuleBuildTiny"
+module_maker   = "ModuleBuildTiny"
 static_install = "auto"
 
 [unsupported]
@@ -13,5 +12,5 @@ os = [
 ]
 
 [release]
-do_not_upload_to_cpan = true
+do_not_upload_to_cpan = 0
 

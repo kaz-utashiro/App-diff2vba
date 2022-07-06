@@ -72,9 +72,19 @@ Generate reverse order patch.
 
 =head1 INSTALL
 
-cpanm https://github.com/kaz-utashiro/App-diff2vba.git
+=head2 CPANMINUS
+
+Install from CPAN
+
+    cpanm App::diff2vba
+
+or
+
+    cpanm https://github.com/kaz-utashiro/App-diff2vba.git
 
 =head1 SEE ALSO
+
+L<App::diff2vba>, L<https://github.com/kaz-utashiro/App-diff2vba>
 
 L<App::Greple>, L<https://github.com/kaz-utashiro/greple>
 
@@ -93,7 +103,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2021 Kazumasa Utashiro.
+Copyright 2021-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
