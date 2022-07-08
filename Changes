@@ -2,6 +2,10 @@ Revision history for Perl extension App-diff2vba
 
 {{$NEXT}}
 
+0.99 2022-07-08T05:27:23Z
+
+    - Release to CPAN.
+
 0.09 2021-11-20T04:25:18Z
 
     - Use Getopt::EX::Hashed.
