@@ -2,7 +2,7 @@ package App::diff2vba;
 use 5.014;
 use warnings;
 
-our $VERSION = "0.99";
+our $VERSION = "1.00";
 
 use utf8;
 use Encode;
@@ -264,7 +264,7 @@ App::diff2vba - generate VBA patch script from diff output
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =head1 SYNOPSIS
 

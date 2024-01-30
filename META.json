@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -69,15 +69,15 @@
       "homepage" : "https://github.com/kaz-utashiro/App-diff2vba",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/kaz-utashiro/App-diff2vba.git",
+         "url" : "https://github.com/kaz-utashiro/App-diff2vba.git",
          "web" : "https://github.com/kaz-utashiro/App-diff2vba"
       }
    },
-   "version" : "0.99",
+   "version" : "1.00",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 0
 }
